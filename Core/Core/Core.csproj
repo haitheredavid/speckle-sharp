@@ -19,7 +19,7 @@
     <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://speckle.systems/</PackageProjectUrl>
     <Copyright>Copyright (c) AEC Systems Ltd</Copyright>
-    <Configurations>Debug;Release</Configurations>
+    <Configurations>Debug;Release;Base</Configurations>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 

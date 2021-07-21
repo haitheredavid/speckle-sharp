@@ -23,8 +23,7 @@ namespace Objects.Geometry
     public Box bbox { get; set; }
 
     public Pointcloud()
-    {
-    }
+    { }
 
     public IEnumerable<Point> GetPoints()
     {
