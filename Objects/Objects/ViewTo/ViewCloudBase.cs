@@ -25,7 +25,10 @@ namespace Objects.ViewTo
 
     public List<CloudPointBase> Points
     {
-      get { return cloud?.GetPoints().Select(p => p.ToView()).ToList(); }
+      get => cloud?.GetPoints().Select(p => new CloudPointBase
+      {
+        x = p.x, y = p.y, z = p.z, bbox = p.bbox
+      }).ToList();
       set
       {
         var cp = new List<double>();
