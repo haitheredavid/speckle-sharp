@@ -7,24 +7,24 @@ using Speckle.Newtonsoft.Json;
 namespace Objects.ViewTo
 {
 
-  public class ViewCloud : ViewObjectBase, IViewObjValidator
+  public class ViewCloud : AViewObjectBase, IViewObjValidator
   {
 
     [DetachProperty]
     public Pointcloud cloud { get; set; }
-    
+
     [DetachProperty]
     public List<string> cloudMetaData { get; set; }
 
     [JsonIgnore]
     public int count => cloud?.points?.Count % 3 ?? 0;
-  
+
     [JsonIgnore]
-    public bool isValid => cloud != null;
+    public virtual bool isValid => cloud != null;
 
     public List<CloudPointBase> Points
     {
-      get { return cloud?.GetPoints().Select(p => Utils.ToView(p)).ToList(); }
+      get { return cloud?.GetPoints().Select(p => p.ToView()).ToList(); }
       set
       {
         var cp = new List<double>();

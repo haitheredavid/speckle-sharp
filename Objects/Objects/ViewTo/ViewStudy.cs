@@ -4,7 +4,9 @@ using Speckle.Newtonsoft.Json;
 
 namespace Objects.ViewTo
 {
-  public class StudyBase : ViewObjectBase, IViewStudy
+
+
+  public class ViewStudy : AViewObjectBase, IViewName, IViewObjValidator
   {
 
     public string viewName { get; set; }
@@ -12,9 +14,9 @@ namespace Objects.ViewTo
     public List<IViewObjBase> objects { get; set; }
 
     [JsonIgnore]
-    public bool isValid => viewName.Valid();
+    public  bool isValid => viewName.Valid();
 
-    public StudyBase()
+    public ViewStudy()
     { }
   }
 }
