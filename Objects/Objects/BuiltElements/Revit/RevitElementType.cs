@@ -1,6 +1,4 @@
-﻿using Speckle.Core.Kits;
-using Speckle.Core.Models;
-using System.Collections.Generic;
+﻿using Speckle.Core.Models;
 
 namespace Objects.BuiltElements.Revit
 {

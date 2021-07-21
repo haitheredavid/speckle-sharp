@@ -9,7 +9,7 @@ namespace Objects.ViewTo
   public class ViewContentTargetIsolated : ViewContentTarget
   {
     [DetachProperty]
-    public List<RigParameters> @params { get; set; }
+    public List<RigParameterBase> @params { get; set; }
    
     [JsonIgnore]
     public override bool isValid => base.isValid && @params != null && @params.Any();

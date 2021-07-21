@@ -1,6 +1,6 @@
 ﻿namespace Objects.ViewTo
 {
-  public class ViewContentBlocker : ViewContent
+  public class ViewContentBlocker : ViewContentBase
   {
     
     public ViewContentBlocker()

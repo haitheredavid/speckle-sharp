@@ -1,10 +1,11 @@
 ﻿using HaiThere.Utilities;
 using Speckle.Newtonsoft.Json;
+using ViewTo.Structure;
 
 namespace Objects.ViewTo
 {
 
-  public class ViewContentTarget : ViewContent, IViewName
+  public class ViewContentTarget : ViewContentBase, IViewName
   {
     public string viewName { get; set; }
 

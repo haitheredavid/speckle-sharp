@@ -1,9 +1,5 @@
 ﻿using Speckle.Core.Models;
-using Speckle.Core.Kits;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
 
 namespace Objects.Other
 {

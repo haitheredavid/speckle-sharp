@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using HaiThere;
 using Objects.Geometry;
 using Speckle.Core.Models;
 using Speckle.Newtonsoft.Json;
@@ -7,7 +8,7 @@ using Speckle.Newtonsoft.Json;
 namespace Objects.ViewTo
 {
 
-  public class ViewCloud : AViewObjectBase, IViewObjValidator
+  public class ViewCloudBase : AViewObjectBase, IValidator
   {
 
     [DetachProperty]
@@ -40,7 +41,7 @@ namespace Objects.ViewTo
       }
     }
 
-    public ViewCloud()
+    public ViewCloudBase()
     { }
   }
 }

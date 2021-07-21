@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using HaiThere;
 using HaiThere.Utilities;
 using Speckle.Core.Models;
 
 namespace Objects.ViewTo
 {
-  public class ContentBundle : AViewObjectBase, IViewObjValidator
+  public class ContentBundle : AViewObjectBase, IValidator
   {
     
     [DetachProperty]
@@ -17,8 +18,6 @@ namespace Objects.ViewTo
     public List<ViewContentDesign> designs { get; set; }
 
     public bool isValid => targets.Valid() && blockers.Valid();
-
-    
 
   }
 }

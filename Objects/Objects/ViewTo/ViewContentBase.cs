@@ -1,10 +1,11 @@
-﻿using Speckle.Core.Models;
+﻿using HaiThere;
+using Speckle.Core.Models;
 using Speckle.Newtonsoft.Json;
 
 namespace Objects.ViewTo
 {
 
-  public abstract class ViewContent : AViewObjectBase, IViewObjValidator
+  public abstract class ViewContentBase : AViewObjectBase, IValidator
   {
     [DetachProperty]
     public Base content { get; set; }
@@ -12,7 +13,7 @@ namespace Objects.ViewTo
     [JsonIgnore]
     public virtual bool isValid => content != null;
     
-    public ViewContent()
+    public ViewContentBase()
     { }
   }
 }

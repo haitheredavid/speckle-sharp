@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Objects.Geometry;
+using ViewTo.Structure;
 
 namespace Objects.ViewTo
 {
-  public class ViewerBundleHorizontal : ViewerBundle
+  public class ViewerBundleBaseHorizontal : ViewerBundleBase
   {
     public List<Viewer> viewers => new List<Viewer>
     {
@@ -13,11 +14,11 @@ namespace Objects.ViewTo
       new Viewer(ViewerDirection.Left)
     };
     
-    public ViewerBundleHorizontal()
+    public ViewerBundleBaseHorizontal()
     { }
   }
 
-  public class ViewerBundleCube : ViewerBundle
+  public class ViewerBundleBaseCube : ViewerBundleBase
   {
     public override List<Viewer> viewers => new List<Viewer>
     {
@@ -29,46 +30,46 @@ namespace Objects.ViewTo
       new Viewer(ViewerDirection.Down)
     };
 
-    public ViewerBundleCube()
+    public ViewerBundleBaseCube()
     { }
 
   }
 
-  public class ViewerBundleFocus : ViewerBundle
+  public class ViewerBundleBaseFocus : ViewerBundleBase
   {
     public override List<Viewer> viewers => new List<Viewer>
       {new Viewer(ViewerDirection.Front)};
 
     public Point focusPoint { get; set; }
 
-    public ViewerBundleFocus()
+    public ViewerBundleBaseFocus()
     { }
   }
 
-  public class ViewerBundleNormal : ViewerBundle
+  public class ViewerBundleBaseNormal : ViewerBundleBase
   {
     public override List<Viewer> viewers => new List<Viewer>
       {new Viewer(ViewerDirection.Front)};
 
-    public ViewerBundleNormal()
+    public ViewerBundleBaseNormal()
     { }
   }
 
-  public class ViewerBundleOrtho : ViewerBundle
+  public class ViewerBundleBaseOrtho : ViewerBundleBase
   {
     public override List<Viewer> viewers => new List<Viewer>
       {new Viewer(ViewerDirection.Front)};
 
-    public ViewerBundleOrtho()
+    public ViewerBundleBaseOrtho()
     { }
   }
 
-  public class ViewerBundle : AViewObjectBase
+  public class ViewerBundleBase : AViewObjectBase, IViewerBundle
   {
     public virtual List<Viewer> viewers => new List<Viewer>
       {new Viewer(ViewerDirection.Front)};
 
-    public ViewerBundle()
+    public ViewerBundleBase()
     { }
   }
 }

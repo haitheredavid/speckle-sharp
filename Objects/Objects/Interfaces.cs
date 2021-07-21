@@ -1,10 +1,4 @@
-﻿using Objects.BuiltElements;
-using Objects.Geometry;
-using Objects.Other;
-using Speckle.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Objects.Geometry;
 using Objects.Primitive;
 
 namespace Objects
