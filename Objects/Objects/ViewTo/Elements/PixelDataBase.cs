@@ -10,7 +10,7 @@ namespace Objects.ViewTo
     /// <summary>
     /// name of view content linked to values 
     /// </summary>
-    public string contentName { get; set; }
+    public string target { get; set; }
     /// <summary>
     /// the values of pixels from every point
     /// </summary>
@@ -27,7 +27,7 @@ namespace Objects.ViewTo
     [JsonIgnore]
     public bool isValid => isSetup && values.Valid();
     [JsonIgnore]
-    public bool isSetup => contentName.Valid();
+    public bool isSetup => target.Valid();
 
     public PixelDataBase()
     { }

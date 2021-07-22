@@ -5,7 +5,7 @@ using Speckle.Newtonsoft.Json;
 
 namespace Objects.ViewTo
 {
-  public class RigParameterBaseLinked : RigParameterBase
+  public class ViewerBundleBaseLinked : ViewerBundleBase
   {
 
     [JsonIgnore]
@@ -14,7 +14,7 @@ namespace Objects.ViewTo
     [DetachProperty]
     public List<ViewCloudBase> linkedClouds { get; set; }
     
-    public RigParameterBaseLinked()
+    public ViewerBundleBaseLinked()
     { }
   }
 }
