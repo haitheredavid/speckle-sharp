@@ -8,7 +8,7 @@ using Speckle.Newtonsoft.Json;
 namespace Objects.ViewTo
 {
 
-  public class ViewCloudBase : AViewObjectBase, IValidator
+  public class ViewCloudBase : ViewObjBase, IValidator
   {
 
     [DetachProperty]
@@ -23,7 +23,7 @@ namespace Objects.ViewTo
     [JsonIgnore]
     public virtual bool isValid => cloud != null;
 
-    public List<CloudPointBase> Points
+    public List<CloudPointBase> points
     {
       get => cloud?.GetPoints().Select(p => new CloudPointBase
       {
@@ -40,6 +40,10 @@ namespace Objects.ViewTo
           cp.Add(point.z);
           cloudMetaData.Add(point.meta);
         }
+        
+        if(cloud == null)
+          cloud = new Pointcloud();
+        
         cloud.points = cp;
       }
     }

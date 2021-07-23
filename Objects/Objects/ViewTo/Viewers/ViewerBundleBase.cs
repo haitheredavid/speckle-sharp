@@ -6,7 +6,7 @@ using ViewTo.Structure;
 namespace Objects.ViewTo
 {
 
-  public class ViewerBundleBase : AViewObjectBase, IViewerBundle<ViewerLayoutBase>
+  public class ViewerBundleBase : ViewObjBase, IViewerBundle<ViewerLayoutBase>
   {
     public List<ViewerLayoutBase> layouts { get; set; }
     [JsonIgnore]

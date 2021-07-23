@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using HaiThere.Utilities;
+using Speckle.Core.Models;
 using Speckle.Newtonsoft.Json;
 using ViewTo.Structure;
 
 namespace Objects.ViewTo
 {
+
+
   public class ResultCloudBase : ViewCloudBase, IResultCloud<PixelDataBase>
   {
     public List<PixelDataBase> data { get; set; }

@@ -4,7 +4,7 @@ using ViewTo.Structure;
 
 namespace Objects.ViewTo
 {
-  public class PixelDataBase : AViewObjectBase, IPixelData
+  public class PixelDataBase : ViewObjBase, IPixelData
   {
 
     /// <summary>

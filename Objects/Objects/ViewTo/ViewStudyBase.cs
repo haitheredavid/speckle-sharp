@@ -6,16 +6,16 @@ using ViewTo.Objects;
 namespace Objects.ViewTo
 {
 
-  public class ViewStudy : AViewObjectBase, IViewStudy<IViewObjBase>
+  public class ViewStudyBase : ViewObjBase, IViewStudy<ViewObjBase>
   {
 
     public string viewName { get; set; }
-    public List<IViewObjBase> objs { get; set; }
+    public List<ViewObjBase> objs { get; set; }
 
     [JsonIgnore]
     public bool isValid => viewName.Valid();
 
-    public ViewStudy()
+    public ViewStudyBase()
     { }
   }
 }

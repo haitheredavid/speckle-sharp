@@ -14,6 +14,11 @@ namespace Objects.ViewTo
     [DetachProperty]
     public List<ViewCloudBase> linkedClouds { get; set; }
     
+    /// <summary>
+    /// temporary list for storing view cloud info to find 
+    /// </summary>
+    public List<string> cloudsToFind { get; set; }
+    
     public ViewerBundleBaseLinked()
     { }
   }

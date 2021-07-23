@@ -5,7 +5,7 @@ using Speckle.Newtonsoft.Json;
 namespace Objects.ViewTo
 {
 
-  public abstract class ViewContentBase : AViewObjectBase, IValidator
+  public abstract class ViewContentBase : ViewObjBase, IValidator
   {
     [DetachProperty]
     public Base content { get; set; }

@@ -13,10 +13,10 @@ namespace Objects.ViewTo
   /// <summary>
   /// simple parent view object for base type
   /// </summary>
-  public abstract class AViewObjectBase : Base, IViewObjBase
+  public abstract class ViewObjBase : Base, IViewObjBase
   {
 
-    public AViewObjectBase()
+    public ViewObjBase()
     { }
 
   }
