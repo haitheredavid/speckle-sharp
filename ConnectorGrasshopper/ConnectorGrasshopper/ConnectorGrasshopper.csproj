@@ -117,6 +117,10 @@
     <Compile Include="Conversion\Serialisation.DeserializeObject.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\GrasshopperAsyncComponent\GrasshopperAsyncComponent\GrasshopperAsyncComponent.csproj">
+      <Project>{114d5e49-ac13-47f7-a70e-b4289579f4e3}</Project>
+      <Name>GrasshopperAsyncComponent</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Core\Core\Core.csproj">
       <Project>{b4d98d2c-e5da-463e-bf6c-68e9b77c72f3}</Project>
       <Name>Core</Name>
@@ -124,6 +128,10 @@
     <ProjectReference Include="..\..\Core\Transports\DiskTransport\DiskTransport.csproj">
       <Project>{8f16a9a1-dc5f-4800-821c-336e6ccf8f9c}</Project>
       <Name>DiskTransport</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Objects\Objects\Objects.csproj">
+      <Project>{860ada00-76da-424a-b30b-320808816deb}</Project>
+      <Name>Objects</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

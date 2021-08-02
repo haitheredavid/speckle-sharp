@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Speckle.Core.Kits
+﻿namespace Speckle.Core.Kits
 {
   public static class Applications
   {

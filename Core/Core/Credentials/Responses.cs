@@ -1,5 +1,4 @@
-﻿using System;
-namespace Speckle.Core.Credentials
+﻿namespace Speckle.Core.Credentials
 {
   public class UserInfoResponse
   {

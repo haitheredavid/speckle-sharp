@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Speckle.Core.Logging;
-using Speckle.Core.Models;
 
 namespace Speckle.Core.Transports
 {
