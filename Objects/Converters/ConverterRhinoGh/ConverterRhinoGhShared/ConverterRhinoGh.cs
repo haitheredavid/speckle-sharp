@@ -148,125 +148,129 @@ namespace Objects.Converter.RhinoGh
           @object = ro.Geometry;
       }
 
-      switch (@object)
-      {
-        case Point3d o:
-          @base = PointToSpeckle(o);
-          break;
-        case Rhino.Geometry.Point o:
-          @base = PointToSpeckle(o);
-          break;
-        case PointCloud o:
-          @base = PointcloudToSpeckle(o);
-          break;
-        case Vector3d o:
-          @base = VectorToSpeckle(o);
-          break;
-        case RH.Interval o:
-          @base = IntervalToSpeckle(o);
-          break;
-        case UVInterval o:
-          @base = Interval2dToSpeckle(o);
-          break;
-        case RH.Line o:
-          @base = LineToSpeckle(o);
-          break;
-        case LineCurve o:
-          @base = LineToSpeckle(o);
-          break;
-        case RH.Plane o:
-          @base = PlaneToSpeckle(o);
-          break;
-        case Rectangle3d o:
-          @base = PolylineToSpeckle(o);
-          break;
-        case RH.Circle o:
-          @base = CircleToSpeckle(o);
-          break;
-        case RH.Arc o:
-          @base = ArcToSpeckle(o);
-          break;
-        case ArcCurve o:
-          @base = ArcToSpeckle(o);
-          break;
-        case RH.Ellipse o:
-          @base = EllipseToSpeckle(o);
-          break;
-        case RH.Polyline o:
-          @base = PolylineToSpeckle(o) as Base;
-          break;
-        case NurbsCurve o:
-          if (o.TryGetEllipse(out RH.Ellipse ellipse))
-            @base = EllipseToSpeckle(ellipse);
-          else
-            @base = CurveToSpeckle(o) as Base;
-          break;
-        case PolylineCurve o:
-          @base = PolylineToSpeckle(o);
-          break;
-        case PolyCurve o:
-          @base = PolycurveToSpeckle(o);
-          break;
-        case RH.Box o:
-          @base = BoxToSpeckle(o);
-          break;
-        case RH.Hatch o:
-          @base = HatchToSpeckle(o);
-          break;
-        case RH.Mesh o:
-          @base = MeshToSpeckle(o);
-          break;
-        
-# if GRASSHOPPER
-        case RH.Transform o:
-          @base = TransformToSpeckle(o);
-          Report.Log("Converter Transform");
-          break;
-        case DisplayMaterial o:
-          @base = DisplayMaterialToSpeckle(o);
-          break;
-#endif
-        
-#if RHINO7
-        case RH.SubD o:
-          if (o.HasBrepForm)
-            @base = BrepToSpeckle(o.ToBrep(new SubDToBrepOptions()),null, displayMesh);
-          else
-            @base = MeshToSpeckle(o);
-          break;
-#endif
-        case RH.Extrusion o:
-          @base = BrepToSpeckle(o.ToBrep(), null, displayMesh);
-          break;
-        case RH.Brep o:
-          @base = BrepToSpeckle(o.DuplicateBrep(), null, displayMesh);
-          break;
-        case NurbsSurface o:
-          @base = SurfaceToSpeckle(o);
-          break;
-        case ViewInfo o:
-          @base = ViewToSpeckle(o);
-          break;
-        case InstanceDefinition o:
-          @base = BlockDefinitionToSpeckle(o);
-          break;
-        case InstanceObject o:
-          @base = BlockInstanceToSpeckle(o);
-          break;
-        case TextEntity o:
-          @base = TextToSpeckle(o);
-          break;
-        case Rhino.Geometry.Dimension o:
-          @base = DimensionToSpeckle(o);
-          break;
-        default:
-          if (reportObj != null)
-          {
-            reportObj.Update(status: ApplicationObject.State.Skipped, logItem: $"{@object.GetType()} type not supported");
-            Report.UpdateReportObject(reportObj);
-          }
-          return @base;
-      }
+			switch (@object)
+			{
+				case Point3d o:
+					@base = PointToSpeckle(o);
+					break;
+				case Rhino.Geometry.Point o:
+					@base = PointToSpeckle(o);
+					break;
+				case PointCloud o:
+					@base = PointcloudToSpeckle(o);
+					break;
+				case Vector3d o:
+					@base = VectorToSpeckle(o);
+					break;
+				case RH.Interval o:
+					@base = IntervalToSpeckle(o);
+					break;
+				case UVInterval o:
+					@base = Interval2dToSpeckle(o);
+					break;
+				case RH.Line o:
+					@base = LineToSpeckle(o);
+					break;
+				case LineCurve o:
+					@base = LineToSpeckle(o);
+					break;
+				case RH.Plane o:
+					@base = PlaneToSpeckle(o);
+					break;
+				case Rectangle3d o:
+					@base = PolylineToSpeckle(o);
+					break;
+				case RH.Circle o:
+					@base = CircleToSpeckle(o);
+					break;
+				case RH.Arc o:
+					@base = ArcToSpeckle(o);
+					break;
+				case ArcCurve o:
+					@base = ArcToSpeckle(o);
+					break;
+				case RH.Ellipse o:
+					@base = EllipseToSpeckle(o);
+					break;
+				case RH.Polyline o:
+					@base = PolylineToSpeckle(o) as Base;
+					break;
+				case NurbsCurve o:
+					if (o.TryGetEllipse(out RH.Ellipse ellipse))
+						@base = EllipseToSpeckle(ellipse);
+					else
+						@base = CurveToSpeckle(o) as Base;
+					break;
+				case PolylineCurve o:
+					@base = PolylineToSpeckle(o);
+					break;
+				case PolyCurve o:
+					@base = PolycurveToSpeckle(o);
+					break;
+				case RH.Box o:
+					@base = BoxToSpeckle(o);
+					break;
+				case RH.Hatch o:
+					@base = HatchToSpeckle(o);
+					break;
+				case RH.Mesh o:
+					@base = MeshToSpeckle(o);
+					break;
+
+				# if GRASSHOPPER
+				case RH.Transform o:
+					@base = TransformToSpeckle(o);
+					Report.Log("Converter Transform");
+					break;
+				case DisplayMaterial o:
+					@base = DisplayMaterialToSpeckle(o);
+					break;
+				#endif
+
+				#if RHINO7
+				case RH.SubD o:
+					if (o.HasBrepForm)
+						@base = BrepToSpeckle(o.ToBrep(new SubDToBrepOptions()), null, displayMesh);
+					else
+						@base = MeshToSpeckle(o);
+					break;
+				#endif
+				case RH.Extrusion o:
+					@base = BrepToSpeckle(o.ToBrep(), null, displayMesh);
+					break;
+				case RH.Brep o:
+					@base = BrepToSpeckle(o.DuplicateBrep(), null, displayMesh);
+					break;
+				case NurbsSurface o:
+					@base = SurfaceToSpeckle(o);
+					break;
+				case ViewInfo o:
+					@base = ViewToSpeckle(o);
+					break;
+				case InstanceDefinition o:
+					@base = BlockDefinitionToSpeckle(o);
+					break;
+				case InstanceObject o:
+					@base = BlockInstanceToSpeckle(o);
+					break;
+				case TextEntity o:
+					@base = TextToSpeckle(o);
+					break;
+				case Rhino.Geometry.Dimension o:
+					@base = DimensionToSpeckle(o);
+					break;
+				case Bundle o:
+					@base = o;
+					break;
+				default:
+					if (reportObj != null)
+					{
+						reportObj.Update(status: ApplicationObject.State.Skipped, logItem: $"{@object.GetType()} type not supported");
+						Report.UpdateReportObject(reportObj);
+					}
+
+					return @base;
+			}
 
       if (@base is null) return @base;
 
