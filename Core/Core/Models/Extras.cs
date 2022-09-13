@@ -80,6 +80,15 @@ namespace Speckle.Core.Models
     }
   }
 
+  public class BundleReferenceArgs : EventArgs
+  {
+    public List<string> referenceObjs { get; set; }
+
+    public string name { get; set; }
+
+    public string id { get; set; }
+  }
+
   /// <summary>
   /// A simple wrapper to keep track of the relationship between speckle objects and their host-application siblings in cases where the
   /// <see cref="Base.applicationId"/> cannot correspond with the <see cref="ApplicationObject.CreatedIds"/> (ie, on receiving operations). 
@@ -207,6 +216,11 @@ namespace Speckle.Core.Models
     /// Keeps track of the conversion process
     /// </summary>
     public List<string> ConversionLog { get; } = new List<string>();
+
+    /// <summary>
+    /// List of bundles to pull down
+    /// </summary>
+    public List<BundleReferenceArgs> BundleReferenceArgs { get; set; } = new List<BundleReferenceArgs>();
 
     private readonly object ConversionLogLock = new object();
     public string ConversionLogString
