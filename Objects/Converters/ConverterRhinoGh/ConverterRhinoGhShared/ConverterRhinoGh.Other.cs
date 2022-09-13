@@ -752,10 +752,16 @@ namespace Objects.Converter.RhinoGh
       return _dimension;
     }
 
-    public Color4f ARBGToColor4f(int argb)
-    {
-      var systemColor = Color.FromArgb(argb);
-      return Color4f.FromArgb(systemColor.A, systemColor.R, systemColor.G, systemColor.B);
-    }
-  }
+		public Color4f ARBGToColor4f(int argb)
+		{
+			var systemColor = Color.FromArgb(argb);
+			return Color4f.FromArgb(systemColor.A, systemColor.R, systemColor.G, systemColor.B);
+		}
+
+		public object BundleToNative(Bundle bundle)
+		{
+			Report.BundleReferenceArgs.Add(new BundleReferenceArgs() { id = bundle.id, name = bundle.name, referenceObjs = bundle.referenceObjects });
+			return bundle;
+		}
+	}
 }
