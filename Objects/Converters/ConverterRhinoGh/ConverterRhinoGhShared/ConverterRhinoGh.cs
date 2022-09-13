@@ -12,6 +12,7 @@ using Grasshopper.Kernel.Types;
 using Speckle.Core.Kits;
 using Speckle.Core.Models;
 using Objects.Geometry;
+using Objects.Organization;
 using Objects.Other;
 using Objects.Primitive;
 
@@ -628,10 +629,14 @@ namespace Objects.Converter.RhinoGh
           rhinoObj = DisplayStyleToNative(o);
           break;
 
-        case RenderMaterial o:
-          #if GRASSHOPPER
-            rhinoObj = RenderMaterialToDisplayMaterial(o);
-          #else
+				case Bundle o:
+					rhinoObj = BundleToNative(o);
+					break;
+				
+				case RenderMaterial o:
+					#if GRASSHOPPER
+					rhinoObj = RenderMaterialToDisplayMaterial(o);
+					#else
             rhinoObj = RenderMaterialToNative(o);
           #endif
           break;
@@ -718,35 +723,36 @@ namespace Objects.Converter.RhinoGh
       }
     }
 
-    public bool CanConvertToNative(Base @object)
-    {
-      switch (@object)
-      {
-        case Point _:
-        case Vector _:
-        case Interval _:
-        case Interval2d _:
-        case Line _:
-        case Plane _:
-        case Circle _:
-        case Arc _:
-        case Ellipse _:
-        case Spiral _:
-        case Polyline _:
-        case Polycurve _:
-        case Curve _:
-        case Hatch _:
-        case Box _:
-        case Mesh _:
-        case Brep _:
-        case Surface _:
-        case Structural.Geometry.Element1D _:
-          return true;
-#if GRASSHOPPER
-        case Transform _:
-        case RenderMaterial _:
-          return true;
-#else
+		public bool CanConvertToNative(Base @object)
+		{
+			switch (@object)
+			{
+				case Point _:
+				case Vector _:
+				case Interval _:
+				case Interval2d _:
+				case Line _:
+				case Plane _:
+				case Circle _:
+				case Arc _:
+				case Ellipse _:
+				case Spiral _:
+				case Polyline _:
+				case Polycurve _:
+				case Curve _:
+				case Hatch _:
+				case Box _:
+				case Mesh _:
+				case Brep _:
+				case Surface _:
+				case Bundle _ :
+				case Structural.Geometry.Element1D _:
+					return true;
+				#if GRASSHOPPER
+				case Transform _:
+				case RenderMaterial _:
+					return true;
+				#else
         // This types are not supported in GH!
         case Pointcloud _:
         case DisplayStyle _:
