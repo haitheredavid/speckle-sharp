@@ -26,7 +26,8 @@ namespace Speckle.Core.Models
     /// </summary>
     public object @base
     {
-      get => _base; set
+      get => _base;
+      set
       {
         _base = value;
         assemblyQualifiedName = value.GetType().AssemblyQualifiedName;
@@ -36,7 +37,8 @@ namespace Speckle.Core.Models
     /// <summary>
     /// See <see cref="Abstract"/> for limitations of this approach.
     /// </summary>
-    public Abstract() { }
+    public Abstract()
+    { }
 
     /// <summary>
     /// See <see cref="Abstract"/> for limitations of this approach.
@@ -58,31 +60,40 @@ namespace Speckle.Core.Models
   public class DataChunk : Base
   {
     public List<object> data { get; set; } = new List<object>();
-    public DataChunk() { }
+
+    public DataChunk()
+    { }
   }
 
   public class ObjectReference
   {
     public string referencedId { get; set; }
+
     public string speckle_type = "reference";
 
-    public ObjectReference() { }
+    public ObjectReference()
+    { }
   }
 
   public class ProgressEventArgs : EventArgs
   {
     public int current { get; set; }
+
     public int total { get; set; }
+
     public string scope { get; set; }
+
     public ProgressEventArgs(int current, int total, string scope)
     {
-      this.current = current; this.total = total; this.scope = scope;
+      this.current = current;
+      this.total = total;
+      this.scope = scope;
     }
   }
 
   public class BundleReferenceArgs : EventArgs
   {
-    public List<string> referenceObjs { get; set; }
+    public Dictionary<string, List<string>> referenceObjs { get; set; }
 
     public string name { get; set; }
 
@@ -118,8 +129,7 @@ namespace Speckle.Core.Models
     /// <summary>
     /// The fallback values if direct conversion is not available, typically displayValue
     /// </summary>
-    [JsonIgnore]
-    public List<ApplicationObject> Fallback { get; set; } = new List<ApplicationObject>(); 
+    [JsonIgnore] public List<ApplicationObject> Fallback { get; set; } = new List<ApplicationObject>();
 
     /// <summary>
     /// The Speckle id (on receive) or native id (on send)
@@ -158,17 +168,19 @@ namespace Speckle.Core.Models
     /// <remarks>
     /// Used during receive for convenience, corresponds to CreatedIds
     /// </remarks>
-    [JsonIgnore]
-    public List<object> Converted { get; set; } = new List<object>();
+    [JsonIgnore] public List<object> Converted { get; set; } = new List<object>();
 
-    public ApplicationObject(string id, string type) 
+    public ApplicationObject(string id, string type)
     {
       OriginalId = id;
       Descriptor = type;
       Status = State.Unknown;
     }
 
-    public void Update(string createdId = null, List<string> createdIds = null, State? status = null, List<string> log = null, string logItem = null, List<object> converted = null, object convertedItem = null)
+    public void Update(
+      string createdId = null, List<string> createdIds = null, State? status = null, List<string> log = null, string logItem = null,
+      List<object> converted = null, object convertedItem = null
+    )
     {
       if (createdIds != null) createdIds.Where(o => !string.IsNullOrEmpty(o) && !CreatedIds.Contains(o))?.ToList().ForEach(o => CreatedIds.Add(o));
       if (createdId != null && !CreatedIds.Contains(createdId)) CreatedIds.Add(createdId);
@@ -183,6 +195,7 @@ namespace Speckle.Core.Models
   public class ProgressReport
   {
     public List<ApplicationObject> ReportObjects { get; set; } = new List<ApplicationObject>();
+
     public List<string> SelectedReportObjects { get; set; } = new List<string>();
 
     public void Log(ApplicationObject obj)
@@ -212,6 +225,7 @@ namespace Speckle.Core.Models
     }
 
     #region Conversion
+
     /// <summary>
     /// Keeps track of the conversion process
     /// </summary>
@@ -223,6 +237,7 @@ namespace Speckle.Core.Models
     public List<BundleReferenceArgs> BundleReferenceArgs { get; set; } = new List<BundleReferenceArgs>();
 
     private readonly object ConversionLogLock = new object();
+
     public string ConversionLogString
     {
       get
@@ -259,7 +274,9 @@ namespace Speckle.Core.Models
     /// Keeps track of errors in the conversions.
     /// </summary>
     public List<Exception> ConversionErrors { get; } = new List<Exception>();
+
     private readonly object ConversionErrorsLock = new object();
+
     public string ConversionErrorsString
     {
       get
@@ -277,14 +294,18 @@ namespace Speckle.Core.Models
         ConversionErrors.Add(exception);
       Log(exception.Message);
     }
+
     #endregion
 
     #region Operation
+
     /// <summary>
     /// Keeps track of errors in the operations of send/receive.
     /// </summary>
     public List<Exception> OperationErrors { get; } = new List<Exception>();
+
     private readonly object OperationErrorsLock = new object();
+
     public string OperationErrorsString
     {
       get
@@ -301,11 +322,12 @@ namespace Speckle.Core.Models
       lock (OperationErrorsLock)
         OperationErrors.Add(exception);
     }
+
     #endregion
 
     public void Merge(ProgressReport report)
     {
-      lock(OperationErrorsLock)
+      lock (OperationErrorsLock)
         OperationErrors.AddRange(report.OperationErrors);
 
       lock (ConversionLogLock)
@@ -314,7 +336,10 @@ namespace Speckle.Core.Models
       // update report object notes
       foreach (var item in ReportObjects)
       {
-        var ids = new List<string> { item.OriginalId };
+        var ids = new List<string>
+        {
+          item.OriginalId
+        };
         if (item.Fallback.Count > 0) ids.AddRange(item.Fallback.Select(o => o.OriginalId));
 
         if (item.Status == ApplicationObject.State.Unknown)
