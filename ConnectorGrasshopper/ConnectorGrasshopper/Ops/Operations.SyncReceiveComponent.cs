@@ -14,6 +14,7 @@ using Speckle.Core.Api;
 using Speckle.Core.Api.SubscriptionModels;
 using Speckle.Core.Credentials;
 using Speckle.Core.Kits;
+using Speckle.Core.Models;
 using Speckle.Core.Transports;
 using Logging = Speckle.Core.Logging;
 
@@ -22,10 +23,15 @@ namespace ConnectorGrasshopper.Ops
   public class SyncReceiveComponent : SelectKitTaskCapableComponentBase<Speckle.Core.Models.Base>
   {
     public StreamWrapper StreamWrapper { get; set; }
+
     private Client ApiClient { get; set; }
+
     public string ReceivedCommitId { get; set; }
+
     public string InputType { get; set; }
+
     public bool AutoReceive { get; set; }
+
     public override GH_Exposure Exposure => GH_Exposure.secondary | GH_Exposure.obscure;
 
     public override void DocumentContextChanged(GH_Document document, GH_DocumentContext context)
@@ -33,23 +39,23 @@ namespace ConnectorGrasshopper.Ops
       switch (context)
       {
         case GH_DocumentContext.Loaded:
-          {
-            // Will execute every time a document becomes active (from background or opening file.).
-            if (StreamWrapper != null)
-              Task.Run(async () =>
-              {
-                // Ensure fresh instance of client.
-                await ResetApiClient(StreamWrapper);
+        {
+          // Will execute every time a document becomes active (from background or opening file.).
+          if (StreamWrapper != null)
+            Task.Run(async () =>
+            {
+              // Ensure fresh instance of client.
+              await ResetApiClient(StreamWrapper);
 
-                // Get last commit from the branch
-                var b = ApiClient.BranchGet(CancelToken, StreamWrapper.StreamId, StreamWrapper.BranchName ?? "main", 1).Result;
+              // Get last commit from the branch
+              var b = ApiClient.BranchGet(CancelToken, StreamWrapper.StreamId, StreamWrapper.BranchName ?? "main", 1).Result;
 
-                // Compare commit id's. If they don't match, notify user or fetch data if in auto mode
-                if (b.commits.items[0].id != ReceivedCommitId)
-                  HandleNewCommit();
-              });
-            break;
-          }
+              // Compare commit id's. If they don't match, notify user or fetch data if in auto mode
+              if (b.commits.items[0].id != ReceivedCommitId)
+                HandleNewCommit();
+            });
+          break;
+        }
         case GH_DocumentContext.Unloaded:
           // Will execute every time a document becomes inactive (in background or closing file.)
           //Correctly dispose of the client when changing documents to prevent subscription handlers being called in background.
@@ -59,6 +65,7 @@ namespace ConnectorGrasshopper.Ops
 
       base.DocumentContextChanged(document, context);
     }
+
     private void HandleNewCommit()
     {
       //CurrentComponentState = "expired";
@@ -72,10 +79,12 @@ namespace ConnectorGrasshopper.Ops
           OnDisplayExpired(true);
       });
     }
+
     private void CleanApiClient()
     {
       ApiClient?.Dispose();
     }
+
     private async Task ResetApiClient(StreamWrapper wrapper)
     {
       ApiClient?.Dispose();
@@ -89,17 +98,17 @@ namespace ConnectorGrasshopper.Ops
     {
       // Break if wrapper is branch type and branch name is not equal.
       if (StreamWrapper.Type == StreamWrapperType.Branch && e.branchName != StreamWrapper.BranchName) return;
+
       HandleNewCommit();
     }
-    
-    public SyncReceiveComponent() : base("Synchronous Receiver", "SR", "Receive data from a Speckle server Synchronously. This will block GH untill all the data are received which can be used to safely trigger other processes downstream",
-      ComponentCategories.SECONDARY_RIBBON, ComponentCategories.SEND_RECEIVE)
-    {
-    }
-    
+
+    public SyncReceiveComponent() : base("Synchronous Receiver", "SR",
+                                         "Receive data from a Speckle server Synchronously. This will block GH untill all the data are received which can be used to safely trigger other processes downstream",
+                                         ComponentCategories.SECONDARY_RIBBON, ComponentCategories.SEND_RECEIVE)
+    { }
+
     public override void AppendAdditionalMenuItems(ToolStripDropDown menu)
     {
-      
       base.AppendAdditionalMenuItems(menu);
 
       Menu_AppendSeparator(menu);
@@ -117,7 +126,7 @@ namespace ConnectorGrasshopper.Ops
       else
       {
         var autoReceiveMi = Menu_AppendItem(menu,
-          "Automatic receiving is disabled because you have specified a direct commit.");
+                                            "Automatic receiving is disabled because you have specified a direct commit.");
         autoReceiveMi.ToolTipText =
           "To enable automatic receiving, you need to input a stream rather than a specific commit.";
       }
@@ -137,6 +146,7 @@ namespace ConnectorGrasshopper.Ops
       //writer.SetBoolean(nameof(ConvertToNative), ConvertToNative);
       return base.Write(writer);
     }
+
     public override bool Read(GH_IReader reader)
     {
       AutoReceive = reader.GetBoolean("AutoReceive");
@@ -152,17 +162,19 @@ namespace ConnectorGrasshopper.Ops
       JustPastedIn = true;
       return base.Read(reader);
     }
-    
+
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
-      pManager.AddGenericParameter("Stream", "S", "The Speckle Stream to receive data from. You can also input the Stream ID or it's URL as text.", GH_ParamAccess.item);
+      pManager.AddGenericParameter("Stream", "S", "The Speckle Stream to receive data from. You can also input the Stream ID or it's URL as text.",
+                                   GH_ParamAccess.item);
     }
+
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
       pManager.AddGenericParameter("Data", "D", "Data received.", GH_ParamAccess.tree);
       pManager.AddTextParameter("Info", "I", "Commit information.", GH_ParamAccess.item);
     }
-    
+
     protected override void SolveInstance(IGH_DataAccess DA)
     {
       if (RunCount == 1)
@@ -173,7 +185,6 @@ namespace ConnectorGrasshopper.Ops
 
       if (InPreSolve)
       {
-
         var task = Task.Run(async () =>
         {
           var acc = await StreamWrapper?.GetAccount();
@@ -181,12 +192,14 @@ namespace ConnectorGrasshopper.Ops
           var remoteTransport = new ServerTransport(acc, StreamWrapper?.StreamId);
           remoteTransport.TransportName = "R";
 
-          Logging.Analytics.TrackEvent(acc, Logging.Analytics.Events.Receive, new Dictionary<string, object>() { { "sync", true } });
-
-          var myCommit = await ReceiveComponentWorker.GetCommit(StreamWrapper, client, (level, message) =>
+          Logging.Analytics.TrackEvent(acc, Logging.Analytics.Events.Receive, new Dictionary<string, object>()
           {
-            AddRuntimeMessage(level, message);
-          }, CancelToken);
+            {
+              "sync", true
+            }
+          });
+
+          var myCommit = await ReceiveComponentWorker.GetCommit(StreamWrapper, client, (level, message) => { AddRuntimeMessage(level, message); }, CancelToken);
 
           if (myCommit == null)
           {
@@ -197,24 +210,24 @@ namespace ConnectorGrasshopper.Ops
           var TotalObjectCount = 1;
 
           var ReceivedObject = Operations.Receive(
-          myCommit.referencedObject,
-          CancelToken,
-          remoteTransport,
-          new SQLiteTransport { TransportName = "LC" }, // Local cache!
-          null,
-          null,
-          count => TotalObjectCount = count,
-          disposeTransports: true
+            myCommit.referencedObject,
+            CancelToken,
+            remoteTransport,
+            new SQLiteTransport
+            {
+              TransportName = "LC"
+            }, // Local cache!
+            null,
+            null,
+            count => TotalObjectCount = count,
+            disposeTransports: true
           ).Result;
 
           try
           {
             await client.CommitReceived(new CommitReceivedInput
             {
-              streamId = StreamWrapper.StreamId,
-              commitId = myCommit.id,
-              message = myCommit.message,
-              sourceApplication = Extras.Utilities.GetVersionedAppName()
+              streamId = StreamWrapper.StreamId, commitId = myCommit.id, message = myCommit.message, sourceApplication = Extras.Utilities.GetVersionedAppName()
             });
           }
           catch
@@ -240,22 +253,106 @@ namespace ConnectorGrasshopper.Ops
       {
         if (@base == null)
           return;
+
         ReceivedObjectId = @base.id;
 
         //the active document may have changed
         Converter?.SetContextDocument(RhinoDoc.ActiveDoc);
-        
-        
+
+        // have to convert the object first to get any bundle items
         var data = Extras.Utilities.ConvertToTree(Converter, @base, AddRuntimeMessage, true);
 
-        DA.SetDataTree(0, data);
+        // if no bundles found we do what is typical
+        if (!Converter.Report.BundleReferenceArgs.Any())
+        {
+          DA.SetDataTree(0, data);
+        }
+        else
+        {
+          TaskList.Clear();
+        }
+
+        if (InPreSolve)
+        {
+          var task = Task.Run(async () =>
+          {
+            var ReceivedObject = new Base();
+
+            foreach (var bundleArgs in Converter.Report.BundleReferenceArgs)
+            {
+              if (CancelToken.IsCancellationRequested)
+              {
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Run out of time!");
+              }
+
+              var bundle = new Base
+              {
+                ["name"] = bundleArgs.name
+              };
+
+              foreach (var bundleItem in bundleArgs.items)
+              {
+                if (CancelToken.IsCancellationRequested)
+                {
+                  AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Run out of time!");
+                }
+
+                // this is silly to do every bundle item
+                var account = await StreamWrapper.GetAccount();
+                var bundleStreamWrapper = new StreamWrapper(bundleItem.streamId, account.userInfo.id, account.serverInfo.url);
+                var remoteTransport = new ServerTransport(account, bundleStreamWrapper.StreamId);
+                remoteTransport.TransportName = "R";
+
+                var TotalObjectCount = 1;
+
+                foreach (var objectId in bundleItem.objectIds)
+                {
+                  if (CancelToken.IsCancellationRequested)
+                  {
+                    AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Run out of time!");
+                  }
+
+                  bundle[objectId] = Operations.Receive(objectId,
+                                                        CancelToken,
+                                                        remoteTransport,
+                                                        new SQLiteTransport
+                                                        {
+                                                          TransportName = "LC"
+                                                        }, // Local cache!
+                                                        null,
+                                                        null,
+                                                        count => TotalObjectCount = count,
+                                                        disposeTransports: true
+                  ).Result;
+                }
+              }
+
+              ReceivedObject[bundleArgs.name] = bundle;
+            }
+
+            return ReceivedObject;
+          }, CancelToken);
+
+          TaskList.Add(task);
+          return;
+        }
+
+        if (!GetSolveResults(DA, out Speckle.Core.Models.Base bundleData))
+        {
+          AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Not running multithread");
+        }
+        else
+        {
+          data = Extras.Utilities.ConvertToTree(Converter, bundleData, AddRuntimeMessage, true);
+          DA.SetDataTree(0, data);
+        }
       }
     }
 
     private void ParseInput(IGH_DataAccess DA)
     {
       IGH_Goo ghGoo = null;
-      if(!DA.GetData(0, ref ghGoo)) return;
+      if (!DA.GetData(0, ref ghGoo)) return;
 
       var input = ghGoo.GetType().GetProperty("Value")?.GetValue(ghGoo);
 
@@ -271,14 +368,14 @@ namespace ConnectorGrasshopper.Ops
           newWrapper = new StreamWrapper(s);
           break;
       }
-      
-      if(newWrapper != null)
+
+      if (newWrapper != null)
         inputType = GetStreamTypeMessage(newWrapper);
-      
+
       InputType = inputType;
       HandleInputType(newWrapper);
     }
-    
+
     private static string GetStreamTypeMessage(StreamWrapper newWrapper)
     {
       var inputType = newWrapper?.Type switch
@@ -307,20 +404,22 @@ namespace ConnectorGrasshopper.Ops
       {
         // NOTE: Handled in do work
       }
-      
+
       if (StreamWrapper != null && StreamWrapper.Equals(wrapper) && !JustPastedIn) return;
+
       StreamWrapper = wrapper;
 
-      Task.Run(async () =>
-      {
-        await ResetApiClient(wrapper);
-      });
+      Task.Run(async () => { await ResetApiClient(wrapper); });
     }
-    
+
     protected override System.Drawing.Bitmap Icon => Resources.SynchronousReceiver;
+
     public override Guid ComponentGuid => new Guid("08C7078E-C6DA-4B3B-A57D-CD291CC79B1C");
+
     public string LastInfoMessage { get; internal set; }
+
     public bool JustPastedIn { get; internal set; }
+
     public string ReceivedObjectId { get; internal set; }
   }
 }
