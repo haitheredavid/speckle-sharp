@@ -26,10 +26,10 @@ namespace BundleTest
 		public void Setup()
 		{
 			// objects are on two different streams
-			bundle = new Bundle("Baby Bundle", new Dictionary<string, List<string>>
+			bundle = new Bundle("Baby Bundle", new List<BundleItem>()
 			{
-				{ simpleMeshStreamId, new() { "994680a63e1df5d257d6a49d4f18c00f", "1e69d528871d9b8d9f8bb0e04191657b" } }, // simple rhino meshes
-				{ tennisBoxStreamId, new() { "3a2409765ad998709745d2f2dbbf566b" } } // Speckle Tennis Box
+				new BundleItem(simpleMeshStreamId, new() { "994680a63e1df5d257d6a49d4f18c00f", "1e69d528871d9b8d9f8bb0e04191657b" }), // Simple meshes
+				new BundleItem(tennisBoxStreamId, new() { "3a2409765ad998709745d2f2dbbf566b" }) // Speckle Tennis Box
 			});
 
 			client = new Client(AccountManager.GetDefaultAccount());
@@ -39,8 +39,8 @@ namespace BundleTest
 		[OneTimeTearDown]
 		public async Task CleanUp()
 		{
-			if (!string.IsNullOrEmpty(commitId))
-				await client.CommitDelete(new CommitDeleteInput { id = commitId, streamId = simpleMeshStreamId });
+			// if (!string.IsNullOrEmpty(commitId))
+			// 	await client.CommitDelete(new CommitDeleteInput { id = commitId, streamId = simpleMeshStreamId });
 
 			transport.Dispose();
 			client.Dispose();
@@ -79,31 +79,31 @@ namespace BundleTest
 
 			var bundledObjs = new Dictionary<string, List<Base>>();
 
-			foreach (var streamId in receivedBundle.referenceObjects.Keys)
+			foreach (var item in receivedBundle.items)
 			{
-				transport = new ServerTransport(client.Account, streamId);
+				transport = new ServerTransport(client.Account, item.streamId);
 
-				var objs = new List<Base>();
+				var objs = new List<Base>(item.objectIds.Count);
 
-				foreach (var id in receivedBundle.referenceObjects[streamId])
+				foreach (var id in item.objectIds)
 				{
 					var @base = await Operations.Receive(id, transport);
 
 					Assert.IsNotNull(@base);
 					objs.Add(@base);
 
-					Console.WriteLine($"{streamId} with {@base.id}");
+					Console.WriteLine($"{item.streamId} with {@base.id}");
 				}
 
 				Assert.IsNotEmpty(objs);
 
-				bundledObjs.Add(streamId, objs);
+				bundledObjs.Add(item.streamId, objs);
 
 				transport.Dispose();
 			}
 
 			Assert.IsNotEmpty(bundledObjs);
-			Assert.IsTrue(bundledObjs.Count == bundle.referenceObjects.Count);
+			Assert.IsTrue(bundledObjs.Count == bundle.items.Count);
 		}
 	}
 }

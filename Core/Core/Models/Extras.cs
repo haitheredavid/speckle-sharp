@@ -64,7 +64,39 @@ namespace Speckle.Core.Models
     public DataChunk()
     { }
   }
+  /// <summary>
+  /// A simple object for keeping track of the information in a bundle
+  /// </summary>
+  public class BundleItem : Base
+  {
+    /// <summary>
+    /// stream id to reference
+    /// </summary>
+    public string streamId { get; set; }
 
+    /// <summary>
+    /// List of objects to pull from stream
+    /// </summary>
+    public List<string> objectIds { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public BundleItem()
+    { }
+
+    /// <summary>
+    /// Simple way of building item
+    /// </summary>
+    /// <param name="streamId"></param>
+    /// <param name="objectIds"></param>
+    public BundleItem(string streamId, List<string> objectIds)
+    {
+      this.streamId = streamId;
+      this.objectIds = objectIds;
+    }
+  }
+  
   public class ObjectReference
   {
     public string referencedId { get; set; }
@@ -93,7 +125,7 @@ namespace Speckle.Core.Models
 
   public class BundleReferenceArgs : EventArgs
   {
-    public Dictionary<string, List<string>> referenceObjs { get; set; }
+    public List<BundleItem> items { get; set; }
 
     public string name { get; set; }
 

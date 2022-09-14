@@ -3,6 +3,7 @@ using Speckle.Core.Models;
 
 namespace Objects.Organization
 {
+
 	/// <summary>
 	/// A simple organization object that links multiple speckle objects into one bundle.
 	/// All linked objects must be situated on the same server
@@ -18,7 +19,7 @@ namespace Objects.Organization
 		/// A list of reference object Ids to link together
 		/// Collection key is the streamId associated with the list of objects to use 
 		/// </summary>
-		[DetachProperty] public Dictionary<string, List<string>> referenceObjects { get; set; }
+		[DetachProperty] public List<BundleItem> items { get; set; }
 
 		/// <summary>
 		/// 
@@ -30,36 +31,47 @@ namespace Objects.Organization
 		/// Basic constructor 
 		/// </summary>
 		/// <param name="name"></param>
-		/// <param name="referenceObjects"></param>
-		public Bundle(string name, Dictionary<string, List<string>> referenceObjects)
+		/// <param name="items"></param>
+		public Bundle(string name, List<BundleItem> items)
 		{
 			this.name = name;
-			this.referenceObjects = referenceObjects;
+			this.items = items;
 		}
+		
+		
 
 		/// <summary>
-		/// Checks if <see cref="name"/> and <see cref="referenceObjects"/> are similar
+		/// Checks if <see cref="name"/> and <see cref="items"/> are similar
 		/// </summary>
 		/// <param name="obj"></param>
 		/// <returns></returns>
 		public bool Equals(Bundle obj)
 		{
 			// check if name are similar along with collection of objects
-			if (!this.name.Equals(obj.name) || obj.referenceObjects?.Count != this.referenceObjects?.Count)
+			if (!this.name.Equals(obj.name) || obj.items?.Count != this.items?.Count)
 				return false;
 
-			foreach (var key in this.referenceObjects.Keys)
+			foreach (var item in this.items)
 			{
-				var ids = this.referenceObjects[key];
+				BundleItem itemToFind = null;
 
-				// check that ids exists and are similar in size 
-				if (!obj.referenceObjects.TryGetValue(key, out var objIds) || ids.Count != objIds.Count)
+				foreach (var o in obj.items)
+				{
+					if (!o.streamId.Equals(item.streamId))
+						continue;
+
+					itemToFind = o;
+					break;
+				}
+
+				if (itemToFind == null || itemToFind.objectIds?.Count != item.objectIds?.Count)
 					return false;
 
 				// check all ids
-				for (int i = 0; i < ids.Count; i++)
+				for (int i = 0; i < item.objectIds.Count; i++)
 				{
-					if (!ids[i].Equals(objIds[i]))
+					// TODO: Might get reordered somehow
+					if (!item.objectIds[i].Equals(itemToFind.objectIds[i]))
 						return false;
 				}
 			}
