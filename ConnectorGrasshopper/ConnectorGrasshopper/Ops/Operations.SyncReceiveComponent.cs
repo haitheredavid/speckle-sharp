@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ConnectorGrasshopper.Extras;
 using ConnectorGrasshopper.Objects;
 using ConnectorGrasshopper.Properties;
 using GH_IO.Serialization;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
 using Rhino;
 using Speckle.Core.Api;
@@ -15,6 +17,7 @@ using Speckle.Core.Api.SubscriptionModels;
 using Speckle.Core.Credentials;
 using Speckle.Core.Kits;
 using Speckle.Core.Models;
+using Speckle.Core.Models.Extensions;
 using Speckle.Core.Transports;
 using Logging = Speckle.Core.Logging;
 
@@ -31,6 +34,10 @@ namespace ConnectorGrasshopper.Ops
     public string InputType { get; set; }
 
     public bool AutoReceive { get; set; }
+
+    public List<BundleReferenceArgs> Bundles { get; set; }
+
+    GH_Structure<IGH_Goo> prevData;
 
     public override GH_Exposure Exposure => GH_Exposure.secondary | GH_Exposure.obscure;
 
@@ -105,7 +112,9 @@ namespace ConnectorGrasshopper.Ops
     public SyncReceiveComponent() : base("Synchronous Receiver", "SR",
                                          "Receive data from a Speckle server Synchronously. This will block GH untill all the data are received which can be used to safely trigger other processes downstream",
                                          ComponentCategories.SECONDARY_RIBBON, ComponentCategories.SEND_RECEIVE)
-    { }
+    {
+      Bundles = new List<BundleReferenceArgs>();
+    }
 
     public override void AppendAdditionalMenuItems(ToolStripDropDown menu)
     {
