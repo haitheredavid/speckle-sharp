@@ -301,22 +301,127 @@ namespace ConnectorGrasshopper.Ops
               ReceivedObject[bundleArgs.name] = bundle;
             }
 
-            return ReceivedObject;
-          }, CancelToken);
+        return ReceivedObject;
+      }, CancelToken);
+    }
 
-          TaskList.Add(task);
-          return;
-        }
+    protected override void AfterSolveInstance()
+    {
+      base.AfterSolveInstance();
 
-        if (!GetSolveResults(DA, out Speckle.Core.Models.Base bundleData))
+      if (Bundles.Any() && prevData != null && prevData.Any())
+        this.ExpireSolution(true);
+    }
+
+    protected override void SolveInstance(IGH_DataAccess DA)
+    {
+      if (RunCount == 1)
+      {
+        ParseInput(DA);
+        if (InputType == "Invalid") return;
+      }
+
+      if (InPreSolve)
+      {
+        if (Bundles.Any())
         {
-          AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Not running multithread");
+          // not sure if this is required
+          TaskList.Clear();
+
+          // read through args
+          TaskList.Add(Task.Run(() => ComputeReceive(Bundles), CancelToken));
         }
         else
         {
-          data = Extras.Utilities.ConvertToTree(Converter, bundleData, AddRuntimeMessage, true);
+          TaskList.Add(Task.Run(ComputeReceive, CancelToken));
+        }
+
+        return;
+      }
+
+      if (CancelToken.IsCancellationRequested)
+      {
+        AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Run out of time!");
+      }
+      else if (!GetSolveResults(DA, out var @base))
+      {
+        AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Not running multithread");
+      }
+      else
+      {
+        if (@base == null)
+          return;
+
+        ReceivedObjectId = @base.id;
+
+        //the active document may have changed
+        Converter?.SetContextDocument(RhinoDoc.ActiveDoc);
+
+        // have to convert the object first to get any bundle items
+        var data = Extras.Utilities.ConvertToTree(Converter, @base, AddRuntimeMessage, true);
+
+        // if there was data from the last pass we want to switch out the bundle object with the conversion info
+        if (prevData != null)
+        {
+          var splicedTree = new GH_Structure<IGH_Goo>();
+
+          // Received Base
+          // -- Bundle Object 
+          // ---- Bundle Items
+          // ------ Base Item
+
+          if (data.get_FirstItem(true) is GH_SpeckleBase wrapper)
+          {
+            // 1. Go through each prev data item to look for the placeholder 
+            foreach (var prevDataBranch in prevData.Paths)
+            {
+              for (var i = 0; i < prevData[prevDataBranch].Count; i++)
+              {
+                IGH_Goo obj = default;
+                var prevItem = prevData[prevDataBranch][i];
+
+                // 2. if we have a speckle base object
+                if (prevItem is GH_SpeckleBase prevSpeckleBase)
+                {
+                  foreach (var memberName in wrapper.Value.GetDynamicMembers())
+                  {
+                    // 3a. if the base id matches with the placeholder of the bundle, we splice!
+                    if (wrapper.Value[memberName] is Base bundle && !string.IsNullOrEmpty(bundle.id) && bundle.id.Equals(prevSpeckleBase.Value.id))
+                    {
+                      obj = new GH_SpeckleBase(bundle);
+                      break;
+                    }
+                  }
+
+                  // 3b.if no object was found but its still a speckle object
+                  obj ??= prevSpeckleBase;
+                }
+                else
+                {
+                  // 3c. if its not a speckle object we just add it back in 
+                  obj = prevItem;
+                }
+
+                // 4. add the object back in
+                splicedTree.Append(obj, prevDataBranch);
+              }
+            }
+          }
+
+          Bundles.Clear();
+          prevData = null;
+          DA.SetDataTree(0, splicedTree);
+        }
+        else
+        {
           DA.SetDataTree(0, data);
         }
+
+        // report any bundles from the converter
+        Bundles = Converter.Report.BundleReferenceArgs;
+
+        if (Bundles.Any())
+          prevData = data;
       }
     }
 
