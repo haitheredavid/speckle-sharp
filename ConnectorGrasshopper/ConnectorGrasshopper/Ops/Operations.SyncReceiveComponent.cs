@@ -184,22 +184,14 @@ namespace ConnectorGrasshopper.Ops
       pManager.AddTextParameter("Info", "I", "Commit information.", GH_ParamAccess.item);
     }
 
-    protected override void SolveInstance(IGH_DataAccess DA)
+    private Task<Base> ComputeReceive()
     {
-      if (RunCount == 1)
+      return Task.Run(async () =>
       {
-        ParseInput(DA);
-        if (InputType == "Invalid") return;
-      }
-
-      if (InPreSolve)
-      {
-        var task = Task.Run(async () =>
-        {
-          var acc = await StreamWrapper?.GetAccount();
-          var client = new Client(acc);
-          var remoteTransport = new ServerTransport(acc, StreamWrapper?.StreamId);
-          remoteTransport.TransportName = "R";
+        var acc = await StreamWrapper?.GetAccount();
+        var client = new Client(acc);
+        var remoteTransport = new ServerTransport(acc, StreamWrapper?.StreamId);
+        remoteTransport.TransportName = "R";
 
           Logging.Analytics.TrackEvent(acc, Logging.Analytics.Events.Receive, new Dictionary<string, object>()
           {
@@ -244,60 +236,32 @@ namespace ConnectorGrasshopper.Ops
             // Do nothing!
           }
 
-          return ReceivedObject;
-        }, CancelToken);
-        TaskList.Add(task);
-        return;
-      }
+        return ReceivedObject;
+      }, CancelToken);
+    }
 
-      if (CancelToken.IsCancellationRequested)
+    private Task<Base> ComputeReceive(List<BundleReferenceArgs> bundleReferenceArgsList)
+    {
+      return Task.Run(async () =>
       {
-        AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Run out of time!");
-      }
-      else if (!GetSolveResults(DA, out Speckle.Core.Models.Base @base))
-      {
-        AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Not running multithread");
-      }
-      else
-      {
-        if (@base == null)
-          return;
-
-        ReceivedObjectId = @base.id;
-
-        //the active document may have changed
-        Converter?.SetContextDocument(RhinoDoc.ActiveDoc);
-
-        // have to convert the object first to get any bundle items
-        var data = Extras.Utilities.ConvertToTree(Converter, @base, AddRuntimeMessage, true);
-
-        // if no bundles found we do what is typical
-        if (!Converter.Report.BundleReferenceArgs.Any())
+        var ReceivedObject = new Base()
         {
-          DA.SetDataTree(0, data);
-        }
-        else
-        {
-          TaskList.Clear();
-        }
+          ["name"] = "Data"
+        };
 
-        if (InPreSolve)
+        var account = await StreamWrapper.GetAccount();
+
+        foreach (var bundleArgs in bundleReferenceArgsList)
         {
-          var task = Task.Run(async () =>
+          if (CancelToken.IsCancellationRequested)
           {
-            var ReceivedObject = new Base();
+            AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Run out of time!");
+          }
 
-            foreach (var bundleArgs in Converter.Report.BundleReferenceArgs)
-            {
-              if (CancelToken.IsCancellationRequested)
-              {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Run out of time!");
-              }
-
-              var bundle = new Base
-              {
-                ["name"] = bundleArgs.name
-              };
+          var bundle = new Base
+          {
+            id = bundleArgs.id
+          };
 
               foreach (var bundleItem in bundleArgs.items)
               {
@@ -306,11 +270,9 @@ namespace ConnectorGrasshopper.Ops
                   AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Run out of time!");
                 }
 
-                // this is silly to do every bundle item
-                var account = await StreamWrapper.GetAccount();
-                var bundleStreamWrapper = new StreamWrapper(bundleItem.streamId, account.userInfo.id, account.serverInfo.url);
-                var remoteTransport = new ServerTransport(account, bundleStreamWrapper.StreamId);
-                remoteTransport.TransportName = "R";
+            var bundleStreamWrapper = new StreamWrapper(bundleItem.streamId, account.userInfo.id, account.serverInfo.url);
+            var remoteTransport = new ServerTransport(account, bundleStreamWrapper.StreamId);
+            remoteTransport.TransportName = "R";
 
                 var TotalObjectCount = 1;
 
