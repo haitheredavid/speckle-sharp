@@ -257,6 +257,9 @@ namespace Objects.Converter.RhinoGh
         case Rhino.Geometry.Dimension o:
           @base = DimensionToSpeckle(o);
           break;
+        case Bundle o:
+          @base = o;
+          break;
         default:
           if (reportObj != null)
           {
@@ -627,6 +630,10 @@ namespace Objects.Converter.RhinoGh
           rhinoObj = DisplayStyleToNative(o);
           break;
 
+        case Bundle o:
+          rhinoObj = BundleToNative(o);
+          break;
+
         case RenderMaterial o:
 #if GRASSHOPPER
             rhinoObj = RenderMaterialToDisplayMaterial(o);
@@ -739,6 +746,7 @@ namespace Objects.Converter.RhinoGh
         case Mesh _:
         case Brep _:
         case Surface _:
+        case Bundle _:
         case Structural.Geometry.Element1D _:
           return true;
 #if GRASSHOPPER

@@ -768,5 +768,11 @@ namespace Objects.Converter.RhinoGh
       var systemColor = Color.FromArgb(argb);
       return Color4f.FromArgb(systemColor.A, systemColor.R, systemColor.G, systemColor.B);
     }
+
+    public object BundleToNative(Bundle bundle)
+    {
+      Report.BundleReferenceArgs.Add(new BundleReferenceArgs() { id = bundle.id, name = bundle.name, items = bundle.items });
+      return bundle;
+    }
   }
 }
